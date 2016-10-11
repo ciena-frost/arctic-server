@@ -19,17 +19,28 @@ module.exports = {
 
     sourceInterface.getHttps(options, function(data){
       var repo = source.createRepo(data, link);
-      callback(repo);
+      var dependencies  = source.createDepArray(data, data.id, repo.id);
+      dbManager.saveItem(repo, 'repositories', function(){
+        dbManager.saveArray(dependencies, 'dependencies', function(){
+          callback(repo);
+        })
+      })
     })
   },
 
   //Function: Will take a name of a dependency or repository and return the packaged repository
   getRepoFromName: function(name, callback){
-    client.get(uri + name.split('@')[0], params, function (error, data, raw, res) {
-      module.exports.getRepoFromLink(data.repository.url.replace('.git', ''),function(repo){
-          callback(repo);
-      })
+    dbManager.findItem(name, 'repositories', function(data) {
+      var notFound = data.length < 1
+      if(notFound){
+        client.get(uri + name.split('@')[0], params, function (error, data, raw, res) {
+          module.exports.getRepoFromLink(data.repository.url.replace('.git', ''),function(repo){
+              callback(repo);
+          })
+        })
+      }else{
+        callback(data)
+      }
     })
-  },
-
+  }
 }

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' });
 var repoModel = require('../models/repository.js');
+var depModel = require('../models/dependency.js');
 var Promise = require('promise');
 var https = require('https');
 var RegClient = require('npm-registry-client');
@@ -29,29 +30,18 @@ module.exports = {
 
     var id = repoModel.getId(repoPackage.name, repoPackage.version),
         attributes = repoModel.getAttributes(repoPackage.name, 'GitHub', repoPackage.author, repoPackage.version, repoPackage.description),
-        relationships = repoModel.getRelationships(repoPackage.dependencies),
-        included = repoModel.getIncluded(),
-        repository = repoModel.createRepo(id, 'repository', attributes, relationships, included);
+        relationships = repoModel.getRelationships(id,repoPackage.dependencies),
+        repository = repoModel.create(id, 'repository', attributes, relationships);
     return(repository);
   },
 
-  formatDependencyArray: function(array){
-    var depArray = [];
-    for(var i in array){
-      var depVersion = JSON.stringify(array[i]).toString().replace(/['"^~]+/g, '');
-      depArray.push(i + "@" + depVersion);
+  createDepArray: function(rawPackage, theId, isdependencyId){
+    repoPackage = JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('ascii')));
+    depArray = []
+    for(var dependency in repoPackage.dependencies){
+        depArray.push(depModel.create(dependency, repoPackage.dependencies[dependency], isdependencyId))
     }
+    return depArray;
 
-    for(var i in array){
-      var depVersion = JSON.stringify(array[i]).toString().replace(/['"^~]+/g, '');
-      depArray.push(
-        { type: "repository",
-          _id : i + "@" + depVersion,
-          attributes: {},
-          links: { self: 'http://localhost:4500/api/repositories/' + i + "@" + depVersion }
-        }
-      );
-    }
-    return depArray
-  }
+  },
 }

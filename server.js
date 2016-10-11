@@ -19,50 +19,66 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     next();
 });
+//Serves the relational document for the repository
+app.get('/api/repositories/:repo/dependencies', function(req, res) {
+  reqManager.getRepoFromName(req.params.repo, function(repo){
+    var idArr = []
+    console.log(repo[0].relationships);
+    for(var i in repo[0].relationships.dependencies.data){
+      idArr.push(repo[0].relationships.dependencies.data[i]._id)
+    }
+    console.log({idArr});
+    dbManager.findArray(idArr, 'dependencies', function(data){
+      console.log({data});
+      res.send({data});
 
-//This will return the project with the name :project
-app.get('/api/projects/:project', function(req, res) {
-  dbManager.findProject(req.params, function(data) {
-    res.send(data);
-  });
+    })
+  })
+});
+
+
+app.get('/api/dependencies/:dep/isdependencies', function(req, res) {
+  dbManager.findIsDependency(req.params.dep, 'repositories', function(data){
+    console.log(data);
+
+  })
 });
 
 //This will return the repo with the name :repo
 app.get('/api/repositories/:repo', function(req, res) {
   //#todo cleanup and put 'findRepository' inside the reqManager
-  dbManager.findRepository(req.params.repo, function(data) {
-    if (data.length < 1){
-      reqManager.getRepoFromName(req.params.repo, function(repo){
-        dbManager.saveItem(repo, 'repository', function(){})
-        res.send(JSON.stringify({"data": repo}));
-      })
-    }else{
-      res.send(JSON.stringify({"data": data}));
-    }
-  });
-});
-
-//This will return all projects
-app.get('/api/projects', function(req, res) {
-  dbManager.findAllProjects(function(data){
-    res.send(data);
-  });
+  reqManager.getRepoFromName(req.params.repo, function(data){
+    res.send({data});
+  })
 });
 
 //Route to GET all projectlink objects
 app.get('/api/repositories/',function(req,res) {
-  dbManager.findAllRepos(function(data){
-    console.log(data);
+  dbManager.findAll('repositories',function(data){
     res.send({data});
+  });
+});
+
+//This will return the dependency with the name :dep
+app.get('/api/dependencies/:dep', function(req, res) {
+  console.log(req.params.dep);
+  dbManager.findItem(req.params.dep, 'dependencies', function(data) {
+    res.send({data:data[0]});
+  });
+});
+
+//
+app.get('/api/dependencies/', function(req, res) {
+  dbManager.findAll('dependencies', function(data) {
+    console.log("Requested Dependencies");
+    res.send();
   });
 });
 
 //Route new projectlinks are sent to from the frontend
 app.post('/api/repositories', bodyParser, function(req,res) {
-  reqManager.getRepoFromLink(req.body.data.attributes.link, function(repo){
-    dbManager.saveItem(repo,'repositories',function(data){
-      res.send(JSON.stringify({"data": repo}));
-    });
+  reqManager.getRepoFromLink(req.body.data.attributes.link, function(data){
+    res.send({data});
   });
 });
 

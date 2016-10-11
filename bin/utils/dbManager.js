@@ -14,19 +14,37 @@ module.exports = {
   },
 
   //Function: Returns array of all repositories
-  findAllRepos: function(callback){
+  findAll: function(col,callback){
     database.connectDb(function(db){
-      database.findAll(db, 'repositories', function(data){
+      database.findAll(db, col, function(data){
         database.closeDb(db);
         callback(data);
       })
     })
   },
 
-  //Function: returns first repository thats id matches "input"
-  findRepository: function(input, callback){
+  findArray: function(arr, col, callback){
     database.connectDb(function(db){
-      database.find(db, 'repositories', input, function(data){
+      database.findArr(db, col, arr, function(data){
+        database.closeDb(db);
+        callback(data)
+      })
+    })
+  },
+
+  //Function: returns first repository thats id matches "input"
+  findItem: function(input, col, callback){
+    database.connectDb(function(db){
+      database.find(db, col, input, function(data){
+        database.closeDb(db);
+        callback(data);
+      })
+    })
+  },
+
+  findIsDependency: function(input, col, callback){
+    database.connectDb(function(db){
+      database.findIsDependency(db, col, input, function(data){
         database.closeDb(db);
         callback(data);
       })
@@ -37,6 +55,15 @@ module.exports = {
   saveItem: function(item, col,callback){
     database.connectDb(function(db){
       database.saveItem(db, col, item, function(data){
+        database.closeDb(db);
+        callback(data);
+      });
+    });
+  },
+
+  saveArray: function(arr, col,callback){
+    database.connectDb(function(db){
+      database.saveArray(db, col, arr, function(data){
         database.closeDb(db);
         callback(data);
       });

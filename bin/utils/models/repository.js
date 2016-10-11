@@ -1,12 +1,13 @@
-module.exports = {
-  createRepo: function(theId, theType, theAttributes, theRelationships){
-    return({
-      _id: theId,
-      type: theType,
-      attributes: theAttributes,
-      relationships: theRelationships
-    });
+var config = require("../../config");
 
+module.exports = {
+  create: function(theId, theType, theAttributes, theRelationships){
+    return({
+        _id: theId,
+        type: theType,
+        attributes: theAttributes,
+        relationships: theRelationships,
+      });
   },
 
   getId: function(name, version){
@@ -23,28 +24,19 @@ module.exports = {
     }
   },
 
-  getRelationships: function(array){
+  getRelationships: function(id,array){
     //#todo will outline the
     var theData = []
     for(var i in array){
-      var depVersion = JSON.stringify(array[i]).toString().replace(/['"^~]+/g, '');
-      theData.push({ "type": "repository" , "_id": i + "@" + depVersion});
+      var depVersion = JSON.stringify(array[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
+      theData.push({"type": "dependency", "id": i + "@" + depVersion});
+
     }
-    return {
-      dependencies : {
-        links : {
-          self : "http://localhost:4500/api/repositories"
-        },
-        data: theData
-      }
+    var relationships = {
+      dependencies : {data:theData}
     }
+
+    return relationships
   },
-
-  getIncluded: function(array){
-    //#todo will contain all dependencies of the initial repository
-
-
-  }
-
 
 }
