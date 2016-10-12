@@ -22,17 +22,7 @@ app.use(function(req, res, next) {
 //Serves the relational document for the repository
 app.get('/api/repositories/:repo/dependencies', function(req, res) {
   reqManager.getRepoFromName(req.params.repo, function(repo){
-    var idArr = []
-    console.log(repo[0].relationships);
-    for(var i in repo[0].relationships.dependencies.data){
-      idArr.push(repo[0].relationships.dependencies.data[i]._id)
-    }
-    console.log({idArr});
-    dbManager.findArray(idArr, 'dependencies', function(data){
-      console.log({data});
-      res.send({data});
-
-    })
+    res.send(repo[0].relationships.dependencies);
   })
 });
 
@@ -70,7 +60,6 @@ app.get('/api/dependencies/:dep', function(req, res) {
 //
 app.get('/api/dependencies/', function(req, res) {
   dbManager.findAll('dependencies', function(data) {
-    console.log("Requested Dependencies");
     res.send();
   });
 });

@@ -24,16 +24,22 @@ module.exports = {
     }
   },
 
-  getRelationships: function(id,array){
+  getRelationships: function(id,depArray, devArray){
     //#todo will outline the
-    var theData = []
-    for(var i in array){
-      var depVersion = JSON.stringify(array[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
-      theData.push({"type": "dependency", "id": i + "@" + depVersion});
-
+    var depArr = []
+    for(var i in depArray){
+      var depVersion = JSON.stringify(depArray[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
+      depArr.push({"type": "dependency", "id": i + "@" + depVersion});
     }
+    var devArr = []
+    for(var i in devArray){
+      var devVersion = JSON.stringify(devArray[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
+      devArr.push({"type": "dependency", "id": i + "@" + devVersion});
+    }
+    console.log(devArr);
     var relationships = {
-      dependencies : {data:theData}
+      dependencies : {data:depArr},
+      devdependencies : {data: devArr}
     }
 
     return relationships

@@ -26,17 +26,18 @@ module.exports = {
 
   //#todo Replace with newCreateRepo() function
   createRepo: function(rawPackage,link) {
-    repoPackage = JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('ascii')));
+    repoPackage = module.exports.parsePack(rawPackage);
 
     var id = repoModel.getId(repoPackage.name, repoPackage.version),
         attributes = repoModel.getAttributes(repoPackage.name, 'GitHub', repoPackage.author, repoPackage.version, repoPackage.description),
-        relationships = repoModel.getRelationships(id,repoPackage.dependencies),
+        relationships = repoModel.getRelationships(id,repoPackage.dependencies, repoPackage.devDependencies),
         repository = repoModel.create(id, 'repository', attributes, relationships);
     return(repository);
   },
 
   createDepArray: function(rawPackage, theId, isdependencyId){
-    repoPackage = JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('ascii')));
+    repoPackage = module.exports.parsePack(rawPackage);
+
     depArray = []
     for(var dependency in repoPackage.dependencies){
         depArray.push(depModel.create(dependency, repoPackage.dependencies[dependency], isdependencyId))
@@ -44,4 +45,8 @@ module.exports = {
     return depArray;
 
   },
+
+  parsePack: function(rawPackage) {
+    return JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('ascii')));
+  }
 }
