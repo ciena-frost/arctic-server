@@ -19,6 +19,13 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     next();
 });
+
+app.get('/api/repositories/:repo/isdependencies', function(req, res) {
+  reqManager.getRepoFromName(req.params.repo, function(repo){
+    res.send(repo[0].relationships.dependencies);
+  })
+});
+
 //Serves the relational document for the repository
 app.get('/api/repositories/:repo/dependencies', function(req, res) {
   reqManager.getRepoFromName(req.params.repo, function(repo){
@@ -29,15 +36,20 @@ app.get('/api/repositories/:repo/dependencies', function(req, res) {
 
 app.get('/api/dependencies/:dep/isdependencies', function(req, res) {
   dbManager.findIsDependency(req.params.dep, 'repositories', function(data){
-    console.log(data);
 
   })
 });
 
 //This will return the repo with the name :repo
 app.get('/api/repositories/:repo', function(req, res) {
-  //#todo cleanup and put 'findRepository' inside the reqManager
   reqManager.getRepoFromName(req.params.repo, function(data){
+    //#todo find if 'data' is a priority repo. If it is search
+    //other priority repos for anything that lists'data.id' as a dependency.
+    if (reqManager.isPriority(data)){
+
+    }
+    console.log(data);
+
     res.send({data});
   })
 });
@@ -51,7 +63,6 @@ app.get('/api/repositories/',function(req,res) {
 
 //This will return the dependency with the name :dep
 app.get('/api/dependencies/:dep', function(req, res) {
-  console.log(req.params.dep);
   dbManager.findItem(req.params.dep, 'dependencies', function(data) {
     res.send({data:data[0]});
   });

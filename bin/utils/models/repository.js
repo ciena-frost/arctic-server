@@ -14,12 +14,14 @@ module.exports = {
     return name + "@" + version;
   },
 
-  getAttributes: function(theName, theSource, theUser, theVersion, theDescription){
+  getAttributes: function(theName, theSource, theUser, theVersion, theOrganization, theKeywords, theDescription){
     return {
       name: theName,
       source: theSource,
       user: theUser,
       version: theVersion,
+      organizations: theOrganization,
+      keywords: theKeywords,
       description: theDescription
     }
   },
@@ -36,7 +38,6 @@ module.exports = {
       var devVersion = JSON.stringify(devArray[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
       devArr.push({"type": "dependency", "id": i + "@" + devVersion});
     }
-    console.log(devArr);
     var relationships = {
       dependencies : {data:depArr},
       devdependencies : {data: devArr}

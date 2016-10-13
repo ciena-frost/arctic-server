@@ -1,14 +1,14 @@
-var express = require('express');
-var bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' });
-var Promise = require('promise');
-var https = require('https');
-var sourceInterface = require('./sourceInterface.js');
-var dbManager = require('./dbManager.js')
-var RegClient = require('npm-registry-client');
-var client = new RegClient();
-var uri = "https://registry.npmjs.org/";
-var params = {timeout: 1000};
-var fs = require('fs');
+var express = require('express'),
+    bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' }),
+    Promise = require('promise'),
+    https = require('https'),
+    sourceInterface = require('./sourceInterface.js'),
+    dbManager = require('./dbManager.js'),
+    config = require('../config.json')
+    RegClient = require('npm-registry-client'),
+    client = new RegClient(),
+    uri = "https://registry.npmjs.org/",
+    params = {timeout: 1000},
 
 
 module.exports = {
@@ -20,6 +20,7 @@ module.exports = {
     sourceInterface.getHttps(options, function(data){
       var repo = source.createRepo(data, link);
       var dependencies  = source.createDepArray(data, data.id, repo.id);
+      console.log(dependencies);
       dbManager.saveItem(repo, 'repositories', function(){
         dbManager.saveArray(dependencies, 'dependencies', function(){
           callback(repo);
@@ -42,5 +43,11 @@ module.exports = {
         callback(data)
       }
     })
+  },
+
+  isPriority: function(data){
+    //Comapre properties of data to config.priorityConditions and return true or false.
+
+
   }
 }

@@ -1,4 +1,9 @@
 {
   "database" : "./dbInterface/dbMongo.js",
-  "API" : "http://localhost:4500"
+  "API" : "http://localhost:4500",
+  "priorityConditions" : {
+      "organizations" : ["ciena-blueplanet"],
+      "keywords" : [],
+      "repositories" : ["bunsen"]
+      }
 }
