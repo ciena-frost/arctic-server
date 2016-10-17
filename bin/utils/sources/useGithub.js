@@ -1,7 +1,6 @@
-var express = require('express');
-var bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' });
-var repoModel = require('../models/repository.js');
-var depModel = require('../models/dependency.js');
+var express = require('express'),
+    repoModel = require('../models/repository.js'),
+    depModel = require('../models/dependency.js')
 
 module.exports = {
   getOptions: function(link) {
@@ -20,16 +19,14 @@ module.exports = {
     };
   },
 
-  //#todo Replace with newCreateRepo() function
   createRepo: function(rawPackage,link) {
     repoPackage = module.exports.parsePack(rawPackage);
-    console.log(repoPackage.devDependencies);
     var id = repoModel.getId(repoPackage.name, repoPackage.version),
         attributes = repoModel.getAttributes(repoPackage.name,
                                              'GitHub',
                                              repoPackage.author,
                                              repoPackage.version,
-                                             repoPackage.organization,
+                                             (JSON.parse(rawPackage).url).split('/')[4],
                                              repoPackage.keywords,
                                              repoPackage.description),
         relationships = repoModel.getRelationships(id,repoPackage.dependencies, repoPackage.devDependencies),
@@ -52,6 +49,6 @@ module.exports = {
   },
   //Github returns a base64 string. Need to parse, grab content and convert from base64.
   parsePack: function(rawPackage) {
-    return JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('ascii')));
+    return JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('utf8')));
   }
 }

@@ -1,17 +1,8 @@
-var express = require('express');
-var Promise = require('promise');
-var dbManager = require('./bin/utils/dbManager.js')
-var reqManager = require('./bin/utils/reqManager.js')
-var bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' });
-var https = require('https');
-var RegClient = require('npm-registry-client');
-var client = new RegClient();
-var uri = "https://registry.npmjs.org/";
-var params = {timeout: 1000};
-var fs = require('fs');
-
-var app = express();
-var packagedb = []
+var express = require('express'),
+    dbManager = require('./bin/utils/dbManager.js'),
+    reqManager = require('./bin/utils/reqManager.js'),
+    bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' })
+    app = express();
 
 app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -45,10 +36,8 @@ app.get('/api/repositories/:repo', function(req, res) {
   reqManager.getRepoFromName(req.params.repo, function(data){
     //#todo find if 'data' is a priority repo. If it is search
     //other priority repos for anything that lists'data.id' as a dependency.
-    if (reqManager.isPriority(data)){
-
-    }
-    console.log(data);
+    // if (reqManager.isPriority(data)){
+    // }
 
     res.send({data});
   })

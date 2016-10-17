@@ -1,8 +1,6 @@
-var express = require('express');
-var Promise = require('promise');
-var MongoClient = require('mongodb').MongoClient;
-var config = require("../config");
-var database = require(config.database);
+var express = require('express'),
+    config = require("../config"),
+    database = require(config.database)
 
 module.exports = {
   //Function: Returns array of all projects

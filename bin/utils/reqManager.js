@@ -17,10 +17,10 @@ module.exports = {
     var source = sourceInterface.getSource(link),
         options = source.getOptions(link)
 
+      console.log(options);
     sourceInterface.getHttps(options, function(data){
       var repo = source.createRepo(data, link);
       var dependencies  = source.createDepArray(data, data.id, repo.id);
-      console.log(dependencies);
       dbManager.saveItem(repo, 'repositories', function(){
         dbManager.saveArray(dependencies, 'dependencies', function(){
           callback(repo);
@@ -46,8 +46,26 @@ module.exports = {
   },
 
   isPriority: function(data){
-    //Comapre properties of data to config.priorityConditions and return true or false.
+    //Compare properties of data to config.priorityConditions and return true or false.
+
+    //if part of config.priorityConditions.organization
+    if(module.exports.matchOne(data[0].attributes.organizations, config.priorityConditions.organizations)){
+      return true
+    }else if (module.exports.matchOne(data[0].attributes.keywords, config.priorityConditions.keywords)) {
+
+    }else if (module.exports.matchOne(data[0].attributes.name, config.priorityConditions.repositories)) {
+
+    }
+    //if has certain config.priorityConditions.keywords
+    //if repo name is in config.priorityConditions.repositories
 
 
+
+  },
+  //Takes 2 arrays and outputs true if there is a common element
+  matchOne: function(arr1, arr2) {
+    return arr2.some(function (v) {
+        return arr1.indexOf(v) >= 0;
+    })
   }
 }

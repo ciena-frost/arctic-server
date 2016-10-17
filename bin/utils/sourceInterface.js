@@ -1,13 +1,8 @@
-var express = require('express');
-var bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' });
-var Promise = require('promise');
-var https = require('https');
-var RegClient = require('npm-registry-client');
-var useGithub = require('./sources/useGithub.js');
-var client = new RegClient();
-var uri = "https://registry.npmjs.org/";
-var params = {timeout: 1000};
-var fs = require('fs');
+var express = require('express'),
+    https = require('https'),
+    RegClient = require('npm-registry-client'),
+    client = new RegClient(),
+    useGithub = require('./sources/useGithub.js')
 
 module.exports = {
 

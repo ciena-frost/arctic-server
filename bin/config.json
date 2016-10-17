@@ -2,7 +2,7 @@
   "database" : "./dbInterface/dbMongo.js",
   "API" : "http://localhost:4500",
   "priorityConditions" : {
-      "organizations" : ["ciena-blueplanet"],
+      "organizations" : ["ciena-frost"],
       "keywords" : [],
       "repositories" : ["bunsen"]
       }
