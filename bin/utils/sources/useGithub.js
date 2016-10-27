@@ -1,6 +1,8 @@
 var express = require('express'),
     repoModel = require('../models/repository.js'),
-    depModel = require('../models/dependency.js')
+    versionModel = require('../models/version.js'),
+    depModel = require('../models/dependency.js'),
+    config = require('../../config.json')
 
 module.exports = {
   getOptions: function(link) {
@@ -14,41 +16,68 @@ module.exports = {
       path: '/repos/' + link[1] + '/' + link[2] + '/contents/package.json',
       headers: {
        'User-Agent': 'NickLewanowicz',
+       'Authorization': config.gitAuthorization
+     }
+    };
+  },
+
+  getOptionsOrg: function(org){
+    return options = {
+      host: 'api.github.com',
+      path: '/users/' + org + '/repos',
+      headers: {
+       'User-Agent': 'NickLewanowicz',
        'Authorization': 'token 56822a9924a1b2d9109c05c8737b37929b4b7047'
      }
     };
   },
 
-  createRepo: function(rawPackage,link) {
-    repoPackage = module.exports.parsePack(rawPackage);
-    var id = repoModel.getId(repoPackage.name, repoPackage.version),
-        attributes = repoModel.getAttributes(repoPackage.name,
-                                             'GitHub',
-                                             repoPackage.author,
-                                             repoPackage.version,
-                                             (JSON.parse(rawPackage).url).split('/')[4],
-                                             repoPackage.keywords,
-                                             repoPackage.description),
-        relationships = repoModel.getRelationships(id,repoPackage.dependencies, repoPackage.devDependencies),
-        repository = repoModel.create(id, 'repository', attributes, relationships);
-    return(repository);
+  createRepo: function(repoPackage,link, org) {
+    var repository = repoModel.create(repoPackage.name,
+                                      link,
+                                      repoPackage.version,
+                                      org.split('/')[2],
+                                      repoPackage.description,
+                                      [{type: 'version', id: repoPackage.name + '@' + repoPackage.version}],
+                                      repoPackage.keywords)
+    return repository;
   },
 
-  createDepArray: function(rawPackage, theId, isdependencyId){
-    repoPackage = module.exports.parsePack(rawPackage);
+  createVersion: function(repoPackage){
+    var dependencies = versionModel.getDependencies(repoPackage.dependencies, repoPackage.devDependencies)
+        version = versionModel.create(repoPackage.name,
+                                      repoPackage.version,
+                                      dependencies[0],
+                                      dependencies[1])
+    return version
+  },
 
+  createDependencies: function(repoPackage){
     depArray = []
     for(var dependency in repoPackage.dependencies){
-        depArray.push(depModel.create(dependency, repoPackage.dependencies[dependency], isdependencyId))
+        depArray.push(depModel.create(dependency, repoPackage.dependencies[dependency]))
     }
     for(var dependency in repoPackage.devDependencies){
-        depArray.push(depModel.create(dependency, repoPackage.devDependencies[dependency], isdependencyId))
+        depArray.push(depModel.create(dependency, repoPackage.devDependencies[dependency]))
     }
     return depArray;
-
   },
+
+  getRepositoryUrl: function(data){
+    return data.html_url
+  },
+
+  getRepositoryArray: function(data){
+    return JSON.parse(data)
+  },
+
   //Github returns a base64 string. Need to parse, grab content and convert from base64.
   parsePack: function(rawPackage) {
-    return JSON.parse((Buffer(JSON.parse(rawPackage).content,'base64').toString('utf8')));
+    rawPackage = JSON.parse(rawPackage)
+    if(rawPackage.message !== "Not Found"){
+      return JSON.parse((Buffer(rawPackage.content,'base64').toString('utf8')));
+    }else{
+      return null
+    }
   }
 }

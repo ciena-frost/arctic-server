@@ -1,71 +1,81 @@
-var express = require('express'),
-    bodyParser = require('body-parser').json({ type: 'application/vnd.api+json' }),
-    Promise = require('promise'),
-    https = require('https'),
-    sourceInterface = require('./sourceInterface.js'),
-    dbManager = require('./dbManager.js'),
-    config = require('../config.json')
-    RegClient = require('npm-registry-client'),
-    client = new RegClient(),
-    uri = "https://registry.npmjs.org/",
-    params = {timeout: 1000},
-
+var repoModel = require('./models/repository.js'),
+    versionModel = require('./models/version.js'),
+    depModel = require('./models/dependency.js'),
+    internalRequest = require('./internalReq.js'),
+    externalRequest = require('./externalReq.js');
 
 module.exports = {
   //Function: Will take a Link to a repositories and return the packaged repository
   getRepoFromLink: function(link,callback){
-    var source = sourceInterface.getSource(link),
-        options = source.getOptions(link)
-
-      console.log(options);
-    sourceInterface.getHttps(options, function(data){
-      var repo = source.createRepo(data, link);
-      var dependencies  = source.createDepArray(data, data.id, repo.id);
-      dbManager.saveItem(repo, 'repositories', function(){
-        dbManager.saveArray(dependencies, 'dependencies', function(){
-          callback(repo);
-        })
-      })
+    externalRequest.getRepositoryData(link, function(repositoryData){
+      internalRequest.saveRepository(repositoryData[0], repositoryData[1], repositoryData[2])
+      callback(repoModel.repoJson(repositoryData[0]))
     })
   },
 
   //Function: Will take a name of a dependency or repository and return the packaged repository
-  getRepoFromName: function(name, callback){
-    dbManager.findItem(name, 'repositories', function(data) {
-      var notFound = data.length < 1
-      if(notFound){
-        client.get(uri + name.split('@')[0], params, function (error, data, raw, res) {
-          module.exports.getRepoFromLink(data.repository.url.replace('.git', ''),function(repo){
-              callback(repo);
+  getRepository: function(name, callback){
+    internalRequest.findItem(name, 'repositories', function(data){
+      if(data.length === 0){
+        name = name.split('@')[0]
+        externalRequest.getRepositoryLink(name, function(link){
+          module.exports.getRepoFromLink(link, function(repo){
+            callback(repo)
           })
         })
       }else{
-        callback(data)
+        callback(data[0])
       }
     })
   },
 
-  isPriority: function(data){
-    //Compare properties of data to config.priorityConditions and return true or false.
-
-    //if part of config.priorityConditions.organization
-    if(module.exports.matchOne(data[0].attributes.organizations, config.priorityConditions.organizations)){
-      return true
-    }else if (module.exports.matchOne(data[0].attributes.keywords, config.priorityConditions.keywords)) {
-
-    }else if (module.exports.matchOne(data[0].attributes.name, config.priorityConditions.repositories)) {
-
-    }
-    //if has certain config.priorityConditions.keywords
-    //if repo name is in config.priorityConditions.repositories
-
-
-
+  getVersion: function(versionName, callback){
+    internalRequest.findItem(versionName, 'versions', function(data) {
+      callback(versionModel.versionJson(data[0]));
+    });
   },
-  //Takes 2 arrays and outputs true if there is a common element
-  matchOne: function(arr1, arr2) {
-    return arr2.some(function (v) {
-        return arr1.indexOf(v) >= 0;
+
+  getDependency: function(depName, callback){
+    internalRequest.findItem(depName, 'dependencies', function(data) {
+      callback(depModel.dependencyJson(data[0]));
+    });
+  },
+
+  getIsDependency: function(id, callback){
+    var regex = { $regex : '@' + id + '$'}
+    internalRequest.findItem(regex, 'relationships', function(isdependencies){
+      var dependencies = []
+      for(var i = 0; i<isdependencies.length; i++){
+        dependencies.push({type:'repository', id: isdependencies[i].repository, dependency:isdependencies[i].dependency })
+      }
+      callback({'id': id, 'type': 'isdependency', 'relationships': {'isdependencies': {'data': dependencies}}})
     })
-  }
+  },
+
+  getAllDependencies: function(type,callback){
+    internalRequest.getAll('dependencies', function(data){
+      for(var i = 0; i<data.length; i++){
+          data[i] = depModel.dependencyJson(data[i])
+      }
+      callback(data)
+    })
+  },
+
+  getAllRepositories: function(callback){
+    internalRequest.getAll('repositories', function(data){
+      for(var i = 0; i<data.length; i++){
+          data[i] = repoModel.repoJson(data[i])
+      }
+      callback(data)
+    })
+  },
+
+  getAllRepos: function(orgInfo){
+    externalRequest.getRepositoryLinkArray(orgInfo.source, orgInfo.name, function(linkArray){
+      for(var i = 0;i<linkArray.length;i++){
+        module.exports.getRepoFromLink(linkArray[i], function(data){})
+      }
+    })
+  },
+
 }

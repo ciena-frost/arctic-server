@@ -1,8 +1,6 @@
-var express = require('express'),
-    https = require('https'),
-    RegClient = require('npm-registry-client'),
-    client = new RegClient(),
+var https = require('https'),
     useGithub = require('./sources/useGithub.js')
+    useBitBucket = require('./sources/useBitBucket.js')
 
 module.exports = {
 
@@ -10,7 +8,15 @@ module.exports = {
     linkData = module.exports.parseLink(link)
     if(linkData[0].indexOf('github')> -1){
       return useGithub
-    }else if(link[0].indexOf('bitbucket')> -1){
+    }else if(linkData[0].indexOf('bitbucket')> -1){
+      return useBitBucket
+    }
+  },
+
+  getSoureOrg: function(org){
+    if (org === 'github'){
+      return useGithub
+    }else if(org === 'bitbucket'){
       return useBitBucket
     }
   },

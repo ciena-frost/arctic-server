@@ -39,12 +39,15 @@ module.exports = {
   },
 
   saveItem: function(db, col, item, callback){
-    item = db.collection(col).insertOne(item);
-    callback(item)
+    db.collection(col).insertOne(item).then(function(data){
+      callback(data)
+    });
   },
 
   saveArray: function(db, col, arr, callback){
-    item = db.collection(col).insertMany(arr);
+    for(var i = 0; i < arr.length; i++){
+      item = db.collection(col).insertOne(arr[i]);
+    }
     callback(arr)
   },
 

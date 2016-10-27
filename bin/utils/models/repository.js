@@ -1,49 +1,28 @@
 var config = require("../../config");
 
 module.exports = {
-  create: function(theId, theType, theAttributes, theRelationships){
+  create: function(name, theLink, theVersion, theOrg, theDesc, theVersions, theKeys){
     return({
-        _id: theId,
-        type: theType,
-        attributes: theAttributes,
-        relationships: theRelationships,
+        _id: name,
+        type: 'repository',
+        version: theVersion,
+        link: theLink,
+        organization: theOrg,
+        description: theDesc,
+        versions: theVersions,
+        keywords: theKeys,
       });
   },
 
-  getId: function(name, version){
-    return name + "@" + version;
+  repoJson: function(doc){
+    return({
+      id: doc._id,
+      type: doc.type,
+      attributes: {version: doc.version, link: doc.link, organization: doc.organization, description: doc.description, keywords: doc.keywords},
+      relationships: {versions: {data: doc.versions}}
+    })
   },
 
-  getAttributes: function(theName, theSource, theUser, theVersion, theOrganization, theKeywords, theDescription){
-    return {
-      name: theName,
-      source: theSource,
-      user: theUser,
-      version: theVersion,
-      organizations: theOrganization,
-      keywords: theKeywords,
-      description: theDescription
-    }
-  },
 
-  getRelationships: function(id,depArray, devArray){
-    //#todo will outline the
-    var depArr = []
-    for(var i in depArray){
-      var depVersion = JSON.stringify(depArray[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
-      depArr.push({"type": "dependency", "id": i + "@" + depVersion});
-    }
-    var devArr = []
-    for(var i in devArray){
-      var devVersion = JSON.stringify(devArray[i]).toString().replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
-      devArr.push({"type": "dependency", "id": i + "@" + devVersion});
-    }
-    var relationships = {
-      dependencies : {data:depArr},
-      devdependencies : {data: devArr}
-    }
-
-    return relationships
-  },
 
 }

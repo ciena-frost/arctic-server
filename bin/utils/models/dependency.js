@@ -1,16 +1,20 @@
 module.exports = {
-  create: function(dependency, theVersion, isdependencyId){
-    theVersion = theVersion.replace(/['"^~]+/g, '').replace('.x', '.0').split('|')[0];
+  create: function(dependency, theVersion){
     var theId = dependency + "@" + theVersion
     return({
       _id: theId,
       type: 'dependency',
-      attributes: {
-        name: dependency,
-        version: theVersion
-      }
+      name: dependency,
+      version: theVersion
     });
 
   },
+  dependencyJson: function(doc){
+    return({
+      id: doc._id,
+      type: doc.type,
+      attributes: {name: doc.name, version: doc.version},
+    })
+  }
 
 }
