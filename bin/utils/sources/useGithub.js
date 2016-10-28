@@ -17,7 +17,7 @@ module.exports = {
       headers: {
        'User-Agent': 'NickLewanowicz',
        'Authorization': config.gitAuthorization
-     }
+      }
     };
   },
 
@@ -27,8 +27,8 @@ module.exports = {
       path: '/users/' + org + '/repos',
       headers: {
        'User-Agent': 'NickLewanowicz',
-       'Authorization': 'token 56822a9924a1b2d9109c05c8737b37929b4b7047'
-     }
+       'Authorization': config.gitAuthorization
+      }
     };
   },
 
@@ -74,10 +74,12 @@ module.exports = {
   //Github returns a base64 string. Need to parse, grab content and convert from base64.
   parsePack: function(rawPackage) {
     rawPackage = JSON.parse(rawPackage)
-    if(rawPackage.message !== "Not Found"){
-      return JSON.parse((Buffer(rawPackage.content,'base64').toString('utf8')));
-    }else{
+    if(rawPackage.message === "Not Found"){
       return null
+    }else if(rawPackage.message === "Moved Permanently"){
+      return null
+    }else{
+      return JSON.parse((Buffer(rawPackage.content,'base64').toString('utf8')));
     }
   }
 }

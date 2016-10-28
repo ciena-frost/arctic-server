@@ -31,9 +31,9 @@ module.exports = {
   },
 
   //Function: returns first repository thats id matches "input"
-  findItem: function(input, col, callback){
+  findItem: function(input, type, callback){
     database.connectDb(function(db){
-      database.find(db, col, input, function(data){
+      database.find(db, type, input, function(data){
         database.closeDb(db);
         callback(data);
       })

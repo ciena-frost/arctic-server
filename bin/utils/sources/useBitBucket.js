@@ -68,7 +68,7 @@ module.exports = {
   //Github returns a base64 string. Need to parse, grab content and convert from base64.
   parsePack: function(rawPackage) {
     rawPackage = JSON.parse(rawPackage)
-    if(rawPackage.lines === undefined){
+    if(rawPackage.message === "You are not permitted to access this resource"){
       return null
     }
     rawPackage = rawPackage.lines
@@ -78,7 +78,6 @@ module.exports = {
       json += rawPackage[i].text
       i++
     }
-    console.log("Parsed");
     return JSON.parse(json)
   }
 }

@@ -9,21 +9,28 @@ module.exports = {
   getRepositoryData: function(link, callback){
     var source = sourceInterface.getSource(link),
         options = source.getOptions(link)
-
     sourceInterface.getHttps(options, function(data){
-      var data = source.parsePack(data)
-      if(!data){return(null)}
-      var repository = source.createRepo(data, link, options.path),
-          version = source.createVersion(data),
-          dependencies  = source.createDependencies(data)
+      data = source.parsePack(data)
+      
+      if(data){
+        var repository = source.createRepo(data, link, options.path),
+            version = source.createVersion(data),
+            dependencies  = source.createDependencies(data)
 
-      callback([repository,version,dependencies])
+        callback(repository,version,dependencies)
+      }else{
+        callback(null)
+      }
     })
   },
 
   getRepositoryLink: function(name, callback){
     client.get(uri + name, params, function (error, data, raw, res) {
-      callback(data.repository.url.replace('.git',''));
+      if(!error){
+        callback(data.repository.url.replace('.git','').replace('git+',''))
+      }else{
+        callback(null)
+      }
     })
   },
 

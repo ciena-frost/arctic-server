@@ -6,25 +6,26 @@ var repoModel = require('./models/repository.js'),
 
 module.exports = {
   //Function: Will take a Link to a repositories and return the packaged repository
-  getRepoFromLink: function(link,callback){
-    externalRequest.getRepositoryData(link, function(repositoryData){
-      internalRequest.saveRepository(repositoryData[0], repositoryData[1], repositoryData[2])
-      callback(repoModel.repoJson(repositoryData[0]))
+  getNewRepository: function(link,callback){
+    externalRequest.getRepositoryData(link, function(repository,version,dependencies){
+      internalRequest.saveRepository(repository, version, dependencies)
+      repository ? repository = repoModel.repoJson(repository) : repository
+      callback(repository)
+
     })
   },
 
   //Function: Will take a name of a dependency or repository and return the packaged repository
   getRepository: function(name, callback){
     internalRequest.findItem(name, 'repositories', function(data){
-      if(data.length === 0){
-        name = name.split('@')[0]
+      if(data.length > 0){
+        callback(repoModel.repoJson(data[0]))
+      }else{
         externalRequest.getRepositoryLink(name, function(link){
-          module.exports.getRepoFromLink(link, function(repo){
+          module.exports.getNewRepository(link,function(repo){
             callback(repo)
           })
         })
-      }else{
-        callback(data[0])
       }
     })
   },
@@ -73,7 +74,8 @@ module.exports = {
   getAllRepos: function(orgInfo){
     externalRequest.getRepositoryLinkArray(orgInfo.source, orgInfo.name, function(linkArray){
       for(var i = 0;i<linkArray.length;i++){
-        module.exports.getRepoFromLink(linkArray[i], function(data){})
+        module.exports.getNewRepository(linkArray[i], function(data){})
+        console.log(linkArray[i]);
       }
     })
   },

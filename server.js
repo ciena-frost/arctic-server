@@ -14,8 +14,7 @@ app.use(function(req, res, next) {
 //Route new projectlinks are sent to from the frontend
 app.post('/api/repositories', bodyParser, function(req,res) {
   reqManager.getRepoFromLink(req.body.data.attributes.link, function(data){
-    console.log(data);
-    res.send({data: repoModel.repoJson(data)});
+    res.send({data});
   });
 });
 
@@ -66,9 +65,9 @@ app.get('/api/isdependencies', function(req, res) {
 });
 
 app.listen('4500', function(){
-  if(config.refreshDatabase){
+  reqManager.getAllRepositories(function(data){
     for(var i = 0;i<config.priorityConditions.organizations.length;i++){
       reqManager.getAllRepos(config.priorityConditions.organizations[i])
     }
-  }
+  })
 });
