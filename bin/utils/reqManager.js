@@ -22,9 +22,14 @@ module.exports = {
         callback(repoModel.repoJson(data[0]))
       }else{
         externalRequest.getRepositoryLink(name, function(link){
-          module.exports.getNewRepository(link,function(repo){
-            callback(repo)
-          })
+          if(link){
+            module.exports.getNewRepository(link,function(repo){
+              callback(repo)
+            })
+          }else{
+            callback(null)
+          }
+
         })
       }
     })

@@ -9,9 +9,10 @@ module.exports = {
   getRepositoryData: function(link, callback){
     var source = sourceInterface.getSource(link),
         options = source.getOptions(link)
+        
     sourceInterface.getHttps(options, function(data){
       data = source.parsePack(data)
-      
+
       if(data){
         var repository = source.createRepo(data, link, options.path),
             version = source.createVersion(data),
