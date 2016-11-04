@@ -13,7 +13,7 @@ app.use(function(req, res, next) {
 
 //Route new projectlinks are sent to from the frontend
 app.post('/api/repositories', bodyParser, function(req,res) {
-  reqManager.getRepoFromLink(req.body.data.attributes.link, function(data){
+  reqManager.getNewRepository(req.body.data.attributes.link, function(data){
     res.send({data});
   });
 });
@@ -40,6 +40,7 @@ app.get('/api/versions/:version', function(req, res) {
 
 //This will return the dependency with the name :dep
 app.get('/api/dependencies/:dep', function(req, res) {
+  console.log(req.params.dep);
   reqManager.getDependency(req.params.dep, function(data) {
     res.send({data});
   });
@@ -64,10 +65,13 @@ app.get('/api/isdependencies', function(req, res) {
   });
 });
 
+
 app.listen('4500', function(){
   reqManager.getAllRepositories(function(data){
-    for(var i = 0;i<config.priorityConditions.organizations.length;i++){
-      reqManager.getAllRepos(config.priorityConditions.organizations[i])
+    if(data.length === 0){
+      for(var i = 0;i<config.priorityConditions.organizations.length;i++){
+        reqManager.getAllRepos(config.priorityConditions.organizations[i])
+      }
     }
-  })
+  });
 });

@@ -7,9 +7,10 @@ var sourceInterface = require('./sourceInterface.js'),
 module.exports = {
   //Function: Will take a Link to a repositories and return the packaged repository
   getRepositoryData: function(link, callback){
-    var source = sourceInterface.getSource(link),
-        options = source.getOptions(link)
-        
+    var source = sourceInterface.getSource(link)
+    if(!source){return null}
+    var options = source.getOptions(link)
+
     sourceInterface.getHttps(options, function(data){
       data = source.parsePack(data)
 
