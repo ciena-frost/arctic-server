@@ -12,18 +12,18 @@ module.exports = {
   },
 
   //Function: Returns array of all repositories
-  findAll: function(col,callback){
+  findAll: function(type,callback){
     database.connectDb(function(db){
-      database.findAll(db, col, function(data){
+      database.findAll(db, type, function(data){
         database.closeDb(db);
         callback(data);
       })
     })
   },
 
-  findArray: function(arr, col, callback){
+  findArray: function(arr, type, callback){
     database.connectDb(function(db){
-      database.findArr(db, col, arr, function(data){
+      database.findArr(db, type, arr, function(data){
         database.closeDb(db);
         callback(data)
       })
@@ -40,9 +40,9 @@ module.exports = {
     })
   },
 
-  findIsDependency: function(input, col, callback){
+  findIsDependency: function(input, type, callback){
     database.connectDb(function(db){
-      database.findIsDependency(db, col, input, function(data){
+      database.findIsDependency(db, type, input, function(data){
         database.closeDb(db);
         callback(data);
       })
@@ -50,18 +50,18 @@ module.exports = {
   },
 
   //Function: Takes repository input and saves it to repository db
-  saveItem: function(item, col,callback){
+  saveItem: function(item, type,callback){
     database.connectDb(function(db){
-      database.saveItem(db, col, item, function(data){
+      database.saveItem(db, type, item, function(data){
         database.closeDb(db);
         callback(data);
       });
     });
   },
 
-  saveArray: function(arr, col,callback){
+  saveArray: function(arr, type,callback){
     database.connectDb(function(db){
-      database.saveArray(db, col, arr, function(data){
+      database.saveArray(db, type, arr, function(data){
         database.closeDb(db);
         callback(data);
       });

@@ -75,7 +75,7 @@ module.exports = {
       callback(data)
     })
   },
-
+  
   getAllRepos: function(orgInfo){
     externalRequest.getRepositoryLinkArray(orgInfo.source, orgInfo.name, function(linkArray){
       for(var i = 0;i<linkArray.length;i++){

@@ -18,8 +18,8 @@ module.exports = {
     })
   },
 
-  findItem: function(name,collection,callback){
-    dbManager.findItem(name, collection, function(data){
+  findItem: function(name,type,callback){
+    dbManager.findItem(name, type, function(data){
       callback(data)
     })
   },

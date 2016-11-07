@@ -65,6 +65,12 @@ app.get('/api/isdependencies', function(req, res) {
   });
 });
 
+app.get('/api/repositorycount', function(req, res) {
+  reqManager.getAllRepositories(function(data){
+    res.send({data: data.length});
+  });
+});
+
 
 app.listen('4500', function(){
   reqManager.getAllRepositories(function(data){
