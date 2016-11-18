@@ -5,31 +5,40 @@ var express = require('express'),
     config = require('../../config.json')
 
 module.exports = {
-  getOptions: function(link) {
+
+  getFileOptions: function(link, fileName){
     if(link.indexOf("//")>-1){
       link = link.split("//")[1]
     }
     link = link.split('/');
-
-    return options = {
-      host: 'api.github.com',
-      path: '/repos/' + link[1] + '/' + link[2] + '/contents/package.json',
-      headers: {
-       'User-Agent': 'NickLewanowicz',
-       'Authorization': config.gitAuthorization
-      }
-    };
+    if(fileName){
+      return module.exports.formatOptions('/repos/' + link[1] + '/' + link[2] + '/contents/' + fileName)
+    }else{
+      return module.exports.formatOptions('/repos/' + link[1] + '/' + link[2])
+    }
   },
 
   getOptionsOrg: function(org){
+    return module.exports.formatOptions('/users/' + org + '/repos')
+    // return options = {
+    //   host: 'api.github.com',
+    //   path: '/users/' + org + '/repos',
+    //   headers: {
+    //    'User-Agent': 'NickLewanowicz',
+    //    'Authorization': config.gitAuthorization
+    //   }
+    // };
+  },
+
+  formatOptions: function(thePath){
     return options = {
       host: 'api.github.com',
-      path: '/users/' + org + '/repos',
+      path: thePath,
       headers: {
        'User-Agent': 'NickLewanowicz',
        'Authorization': config.gitAuthorization
       }
-    };
+    }
   },
 
   createRepo: function(repoPackage,link, org) {

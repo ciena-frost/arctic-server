@@ -1,7 +1,7 @@
 var config = require("../../config");
 
 module.exports = {
-  create: function(name, theLink, theVersion, theOrg, theDesc, theVersions, theKeys){
+  create: function(name, theLink, theVersion, theOrg, theDesc, theVersions, theKeys, wl){
     return({
         _id: name,
         type: 'repository',
@@ -11,10 +11,11 @@ module.exports = {
         description: theDesc,
         versions: theVersions,
         keywords: theKeys,
+        whitelist: wl,
       });
   },
 
-  repoJson: function(doc){
+  createJson: function(doc){
     return({
       id: doc._id,
       type: doc.type,

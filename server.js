@@ -12,6 +12,13 @@ app.use(function(req, res, next) {
 });
 
 //Route new projectlinks are sent to from the frontend
+app.get('/api/dashboard', bodyParser, function(req,res) {
+  reqManager.getDashboard(function(data){
+    res.send({data});
+  });
+});
+
+//Route new projectlinks are sent to from the frontend
 app.post('/api/repositories', bodyParser, function(req,res) {
   reqManager.getNewRepository(req.body.data.attributes.link, function(data){
     res.send({data});
@@ -32,6 +39,12 @@ app.get('/api/repositories/',function(req,res) {
   });
 });
 
+app.get('/api/versions', function(req, res) {
+  reqManager.getAllVersions(function(data) {
+    res.send({data});
+  });
+});
+
 app.get('/api/versions/:version', function(req, res) {
   reqManager.getVersion(req.params.version, function(data) {
     res.send({data});
@@ -40,7 +53,6 @@ app.get('/api/versions/:version', function(req, res) {
 
 //This will return the dependency with the name :dep
 app.get('/api/dependencies/:dep', function(req, res) {
-  console.log(req.params.dep);
   reqManager.getDependency(req.params.dep, function(data) {
     res.send({data});
   });
@@ -73,6 +85,9 @@ app.get('/api/repositorycount', function(req, res) {
 
 
 app.listen('4500', function(){
+  for(var i = 0;i<config.ltsCompliant.length;i++){
+    reqManager.saveLtsList(config.ltsCompliant[i].link, function(data){})
+  }
   reqManager.getAllRepositories(function(data){
     if(data.length === 0){
       for(var i = 0;i<config.priorityConditions.organizations.length;i++){

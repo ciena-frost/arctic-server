@@ -18,10 +18,27 @@ module.exports = {
     };
   },
 
+  getFileOptions: function(link, fileName){
+    if(link.indexOf("//")>-1){
+      link = link.split("//")[1]
+    }
+    link = link.split('/');
+
+    return module.exports.formatOptions('/rest/api/1.0/projects/' + link[2] + '/repos/' + link[4] + '/browse/' + fileName)
+  },
+
   getOptionsOrg: function(org){
     return options = {
       host: 'bitbucket.ciena.com',
       path: '/rest/api/1.0/projects/' + org + '/repos?limit=1000',
+      headers: {'Authorization': config.bitbucketAuthorization}
+    }
+  },
+
+  formatOptions: function(thePath){
+    return options = {
+      host: 'bitbucket.ciena.com',
+      path: thePath,
       headers: {'Authorization': config.bitbucketAuthorization}
     }
   },

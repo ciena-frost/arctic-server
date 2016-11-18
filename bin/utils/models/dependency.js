@@ -5,15 +5,16 @@ module.exports = {
       _id: theId,
       type: 'dependency',
       name: dependency,
-      version: theVersion
+      version: theVersion,
+      ltsCompliant: undefined
     });
 
   },
-  dependencyJson: function(doc){
+  createJson: function(doc){
     return({
       id: doc._id,
       type: doc.type,
-      attributes: {name: doc.name, version: doc.version},
+      attributes: {name: doc.name, version: doc.version, compliant: doc.ltsCompliant },
     })
   }
 

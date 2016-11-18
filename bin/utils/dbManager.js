@@ -1,7 +1,6 @@
 var express = require('express'),
     config = require("../config"),
-    database = require(config.database)
-
+    database = require(config.database);
 module.exports = {
   //Function: Returns array of all projects
   findAllProject: function(){
@@ -15,8 +14,15 @@ module.exports = {
   findAll: function(type,callback){
     database.connectDb(function(db){
       database.findAll(db, type, function(data){
-        database.closeDb(db);
         callback(data);
+      })
+    })
+  },
+
+  findLtsCompliant: function(callback){
+    database.connectDb(function(db){
+      database.findLtsCompliant(db, function(data){
+        callback(data)
       })
     })
   },
@@ -24,7 +30,6 @@ module.exports = {
   findArray: function(arr, type, callback){
     database.connectDb(function(db){
       database.findArr(db, type, arr, function(data){
-        database.closeDb(db);
         callback(data)
       })
     })
@@ -33,8 +38,15 @@ module.exports = {
   //Function: returns first repository thats id matches "input"
   findItem: function(input, type, callback){
     database.connectDb(function(db){
-      database.find(db, type, input, function(data){
-        database.closeDb(db);
+      database.find(db, type, '_id', input, function(data){
+        callback(data);
+      })
+    })
+  },
+
+  findByProperty: function(type, property, query, callback){
+    database.connectDb(function(db){
+      database.find(db, type, property, input, function(data){
         callback(data);
       })
     })
@@ -43,17 +55,15 @@ module.exports = {
   findIsDependency: function(input, type, callback){
     database.connectDb(function(db){
       database.findIsDependency(db, type, input, function(data){
-        database.closeDb(db);
         callback(data);
       })
     })
   },
 
   //Function: Takes repository input and saves it to repository db
-  saveItem: function(item, type,callback){
+  saveItem: function(item, type, callback){
     database.connectDb(function(db){
       database.saveItem(db, type, item, function(data){
-        database.closeDb(db);
         callback(data);
       });
     });
@@ -62,7 +72,6 @@ module.exports = {
   saveArray: function(arr, type,callback){
     database.connectDb(function(db){
       database.saveArray(db, type, arr, function(data){
-        database.closeDb(db);
         callback(data);
       });
     });

@@ -1,22 +1,47 @@
 var express = require('express'),
     Promise = require('promise'),
     MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:27017/ArcticDemo'
+    url = 'mongodb://localhost:27017/ArcticDemo',
+    database = null;
 
 module.exports = {
   connectDb: function(callback){
-    MongoClient.connect(url, function(err, db) {
-      callback(db)
-    })
+    if(database){
+      callback(database)
+    }else{
+      console.log('[MongoDB] Established Connection');
+      MongoClient.connect(url, function(err, db) {
+        if(err){
+          throw err
+        }else{
+          database = db
+          callback(database)
+        }
+      })
+    }
   },
 
   closeDb: function(dbs){
     dbs.close();
   },
 
-  find: function(db, col, input, callback){
+  find: function(db, col, property, query, callback){
+    db.collection(col).find({[property] : query}).toArray().then(function(data){
+      callback(data);
+    })
+  },
+
+  findId: function(db, col, input, callback){
     db.collection(col).find({'_id' : input}).toArray().then(function(data){
       callback(data);
+    })
+  },
+
+  findLtsCompliant: function(db, callback){
+    db.collection('relationships').find({'ltsCompliant' : true}).toArray().then(function(data){
+      db.collection('relationships').find({'ltsCompliant' : false}).toArray().then(function(data2){
+        callback(data.concat(data2));
+      })
     })
   },
 
@@ -39,9 +64,8 @@ module.exports = {
   },
 
   saveItem: function(db, col, item, callback){
-    db.collection(col).insertOne(item).then(function(data){
-      callback(data)
-    });
+    db.collection(col).insertOne(item)
+    callback(item)
   },
 
   saveArray: function(db, col, arr, callback){

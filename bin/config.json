@@ -9,8 +9,11 @@
                          {"name":"ciena-blueplanet","source": "github"}
                         ],
       "keywords" : [],
-      "repositories" : ["bunsen"]
+      "repositories" : []
     },
+  "ltsCompliant": [{"link":"https://github.com/ciena-blueplanet/ember-cli-ember-ecosystem"},
+                   {"link":"https://github.com/ciena-frost/ember-frost-ecosystem"}
+                  ],
   "gitAuthorization" : "token 56822a9924a1b2d9109c05c8737b37929b4b7047" ,
-  "bitbucketAuthorization" : "token ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLFfJt9+c3sFx6Nz/olCIqefJ+i6NphgN8HmLT9XGGEGfUoZLltdO9e03sXnu7KVPlA4PaO8Mbz8+2lpdGtT2Cu7MnV3/D2Nb7RQ6KmXBRmAgvaPqGWVMwF3Xyr2LPm9nWmxYji+mmP98NmzG8eI//Bpi457bW66hRh514PAQT199aQGvU3cbO62KF7RCM5IyvwvX6w+o6zRDtIrVJmWsjuGaE5ycaokH1HzwVw2igj3AY85H5wAM9iGbD8nlhRpsCrqlzsPYOHMf7A36yMLNIIYF9SPUks741eUKHDQewhVtGimwnAZf1jlThzbLW+wMuEtO9DSkoX/r3YrPivwth nlewanow@ciena.com"
+  "bitbucketAuthorization" : ""
 }

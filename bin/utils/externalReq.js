@@ -9,19 +9,19 @@ module.exports = {
   getRepositoryData: function(link, callback){
     var source = sourceInterface.getSource(link)
     if(!source){return null}
-    var options = source.getOptions(link)
+    var options = source.getFileOptions(link,'package.json')
 
     sourceInterface.getHttps(options, function(data){
-      data = source.parsePack(data)
-
+      if(data){
+        data = source.parsePack(data)
+      }
       if(data){
         var repository = source.createRepo(data, link, options.path),
             version = source.createVersion(data),
             dependencies  = source.createDependencies(data)
-
         callback(repository,version,dependencies)
       }else{
-        callback(null)
+        callback(null,null,null)
       }
     })
   },
@@ -48,4 +48,25 @@ module.exports = {
       callback(data)
     })
   },
+
+  getLtsJson: function(link, callback){
+    var source = sourceInterface.getSource(link)
+    if(!source){return null}
+
+    var lts = source.getFileOptions(link, 'lts.json')
+    var eco = source.getFileOptions(link)
+
+    sourceInterface.getHttps(lts, function(ltsList){
+      sourceInterface.getHttps(eco, function(ecosystem){
+        ltsList = source.parsePack(ltsList)
+        ltsName = JSON.parse(ecosystem).name
+
+        if(ltsList){
+          callback(ltsName, ltsList)
+        }else{
+          callback(null)
+        }
+      })
+    })
+  }
 }

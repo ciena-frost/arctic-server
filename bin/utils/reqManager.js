@@ -1,6 +1,7 @@
 var repoModel = require('./models/repository.js'),
     versionModel = require('./models/version.js'),
     depModel = require('./models/dependency.js'),
+    minRequiredModel = require('./models/minRequired.js'),
     internalRequest = require('./internalReq.js'),
     externalRequest = require('./externalReq.js');
 
@@ -8,10 +9,15 @@ module.exports = {
   //Function: Will take a Link to a repositories and return the packaged repository
   getNewRepository: function(link,callback){
     externalRequest.getRepositoryData(link, function(repository,version,dependencies){
-      internalRequest.saveRepository(repository, version, dependencies)
-      repository ? repository = repoModel.repoJson(repository) : repository
-      callback(repository)
-
+      if(repository){
+        internalRequest.saveRepository(repository, version, dependencies, function(){
+        })
+        repository ? repository = repoModel.createJson(repository) : repository
+        callback(repository)
+      }else{
+        //console.log('Unable to add: ' + link);
+        callback()
+      }
     })
   },
 
@@ -19,31 +25,45 @@ module.exports = {
   getRepository: function(name, callback){
     internalRequest.findItem(name, 'repositories', function(data){
       if(data.length > 0){
-        callback(repoModel.repoJson(data[0]))
+        callback(repoModel.createJson(data[0]))
       }else{
         externalRequest.getRepositoryLink(name, function(link){
           if(link){
-            module.exports.getNewRepository(link,function(repo){
-              callback(repo)
-            })
+            module.exports.getNewRepository(link,function(repo){callback(repo)})
           }else{
             callback(null)
           }
-
         })
       }
+    })
+  },
+  saveLtsList: function(link, callback){
+    externalRequest.getLtsJson(link, function(ecosystem, ltsList){
+      console.log(ecosystem, ltsList);
+      for(dependency in ltsList){
+        temp = minRequiredModel.create(ltsList, dependency, ecosystem)
+        console.log(temp);
+        internalRequest.saveItem(temp, 'minRequired', function(data){callback(true)})
+      }
+    })
+  },
+
+  getDashboard: function(callback){
+    internalRequest.getLtsCompliant(function(data){
+      callback(data)
     })
   },
 
   getVersion: function(versionName, callback){
     internalRequest.findItem(versionName, 'versions', function(data) {
-      callback(versionModel.versionJson(data[0]));
+      data = versionModel.createJson(data[0])
+      callback(data);
     });
   },
 
   getDependency: function(depName, callback){
     internalRequest.findItem(depName, 'dependencies', function(data) {
-      callback(depModel.dependencyJson(data[0]));
+      callback(depModel.createJson(data[0]));
     });
   },
 
@@ -61,7 +81,16 @@ module.exports = {
   getAllDependencies: function(type,callback){
     internalRequest.getAll('dependencies', function(data){
       for(var i = 0; i<data.length; i++){
-          data[i] = depModel.dependencyJson(data[i])
+          data[i] = depModel.createJson(data[i])
+      }
+      callback(data)
+    })
+  },
+
+  getAllVersions: function(callback){
+    internalRequest.getAll('versions', function(data){
+      for(var i = 0; i<data.length; i++){
+          data[i] = versionModel.createJson(data[i])
       }
       callback(data)
     })
@@ -70,17 +99,17 @@ module.exports = {
   getAllRepositories: function(callback){
     internalRequest.getAll('repositories', function(data){
       for(var i = 0; i<data.length; i++){
-          data[i] = repoModel.repoJson(data[i])
+          data[i] = repoModel.createJson(data[i])
       }
       callback(data)
     })
   },
-  
+
   getAllRepos: function(orgInfo){
     externalRequest.getRepositoryLinkArray(orgInfo.source, orgInfo.name, function(linkArray){
       for(var i = 0;i<linkArray.length;i++){
-        module.exports.getNewRepository(linkArray[i], function(data){})
-        console.log(linkArray[i]);
+        module.exports.getNewRepository(linkArray[i], function(data){
+        })
       }
     })
   },
