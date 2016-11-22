@@ -11,7 +11,6 @@ module.exports = {
         description: theDesc,
         versions: theVersions,
         keywords: theKeys,
-        whitelist: wl,
       });
   },
 

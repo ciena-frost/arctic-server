@@ -11,7 +11,8 @@ module.exports = {
             if(minRequired.length === 1){
               ltsMin = minRequired[0].version
               ltsCompliant = semver.satisfies(dependencies[i].version, ltsMin)
-              dependencies[i].ltsCompliant = ltsMin
+              dependencies[i].ltsCompliant = [ltsCompliant,ltsMin]
+              console.log(dependencies[i].ltsCompliant);
               if(ltsCompliant){
                 //++ to compiant count for minRequired[0].ecosystem
                 version.compliantPercent[minRequired[0].ecosystem] ? (version.compliantPercent[minRequired[0].ecosystem])[0]++ : version.compliantPercent[minRequired[0].ecosystem] = [1,0]
