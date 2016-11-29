@@ -12,9 +12,7 @@ module.exports = {
               ltsMin = minRequired[0].version
               ltsCompliant = semver.satisfies(dependencies[i].version, ltsMin)
               dependencies[i].ltsCompliant = [ltsCompliant,ltsMin]
-              console.log(dependencies[i].ltsCompliant);
               if(ltsCompliant){
-                //++ to compiant count for minRequired[0].ecosystem
                 version.compliantPercent[minRequired[0].ecosystem] ? (version.compliantPercent[minRequired[0].ecosystem])[0]++ : version.compliantPercent[minRequired[0].ecosystem] = [1,0]
                 version.ltsCompliant.push({"type": "dependency", "id": dependencies[i]._id})
               }else{
@@ -31,8 +29,6 @@ module.exports = {
                                  };
             newRelationships.push(newRelationship)
             if(i === dependencies.length -1){
-              console.log(version.name, version.compliantPercent);
-
               dbManager.saveItem(repository, 'repositories', function(){})
               dbManager.saveItem(version, 'versions', function(){})
               dbManager.saveArray(dependencies, 'dependencies', function(){})

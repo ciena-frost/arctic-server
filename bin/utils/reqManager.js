@@ -29,9 +29,11 @@ module.exports = {
       }else{
         externalRequest.getRepositoryLink(name, function(link){
           if(link){
-            module.exports.getNewRepository(link,function(repo){callback(repo)})
+            module.exports.getNewRepository(link,function(repo){
+              callback(repo)
+            })
           }else{
-            callback(null)
+            callback(err)
           }
         })
       }
@@ -39,10 +41,8 @@ module.exports = {
   },
   saveLtsList: function(link, callback){
     externalRequest.getLtsJson(link, function(ecosystem, ltsList){
-      console.log(ecosystem, ltsList);
       for(dependency in ltsList){
         temp = minRequiredModel.create(ltsList, dependency, ecosystem)
-        console.log(temp);
         internalRequest.saveItem(temp, 'minRequired', function(data){callback(true)})
       }
     })
