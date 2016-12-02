@@ -10,7 +10,11 @@ module.exports = {
           dbManager.findItem(dependencies[i].name, 'minRequired', function(minRequired){
             if(minRequired.length === 1){
               ltsMin = minRequired[0].version
-              ltsCompliant = semver.satisfies(dependencies[i].version, ltsMin)
+              depVer = dependencies[i].version
+              depVer = depVer.replace('^','')
+              depVer = depVer.replace('~','')
+              depver = semver.clean(depVer)
+              ltsCompliant = semver.satisfies(depVer, ltsMin)
               dependencies[i].ltsCompliant = [ltsCompliant,ltsMin]
               if(ltsCompliant){
                 version.compliantPercent[minRequired[0].ecosystem] ? (version.compliantPercent[minRequired[0].ecosystem])[0]++ : version.compliantPercent[minRequired[0].ecosystem] = [1,0]

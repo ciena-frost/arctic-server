@@ -33,7 +33,7 @@ module.exports = {
               callback(repo)
             })
           }else{
-            callback(err)
+            callback(null)
           }
         })
       }
