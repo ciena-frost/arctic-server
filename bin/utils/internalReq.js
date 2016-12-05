@@ -8,6 +8,8 @@ module.exports = {
     let newRelationships = []
         for(let i = 0; i<dependencies.length; i++){
           dbManager.findItem(dependencies[i].name, 'minRequired', function(minRequired){
+            var ltsCompliant = null,
+                ltsMin = null
             if(minRequired.length === 1){
               ltsMin = minRequired[0].version
               depVer = dependencies[i].version
@@ -15,11 +17,17 @@ module.exports = {
               depVer = depVer.replace('~','')
               depver = semver.clean(depVer)
               ltsCompliant = semver.satisfies(depVer, ltsMin)
+              if(semver.satisfies(depVer, ltsMin) === null){
+              }else if (semver.satisfies(depVer, ltsMin)) {
+                ltsCompliant = true
+              }else{
+                ltsCompliant = false
+              }
               dependencies[i].ltsCompliant = [ltsCompliant,ltsMin]
               if(ltsCompliant){
                 version.compliantPercent[minRequired[0].ecosystem] ? (version.compliantPercent[minRequired[0].ecosystem])[0]++ : version.compliantPercent[minRequired[0].ecosystem] = [1,0]
                 version.ltsCompliant.push({"type": "dependency", "id": dependencies[i]._id})
-              }else{
+              }else if (ltsCompliant !== null) {
                 version.compliantPercent[minRequired[0].ecosystem] ? (version.compliantPercent[minRequired[0].ecosystem])[1]++ : version.compliantPercent[minRequired[0].ecosystem] = [0,1]
                 version.ltsNonCompliant.push({"type": "dependency", "id": dependencies[i]._id})
               }
@@ -28,8 +36,8 @@ module.exports = {
                                    'repository': repository._id,
                                    'version': version.version,
                                    'dependency': dependencies[i]._id,
-                                   'ltsMin': ltsMin || null,
-                                   'ltsCompliant': ltsCompliant || null
+                                   'ltsMin': ltsMin,
+                                   'ltsCompliant': ltsCompliant
                                  };
             newRelationships.push(newRelationship)
             if(i === dependencies.length -1){
