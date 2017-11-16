@@ -1,0 +1,19 @@
+{
+  "database" : "./dbInterface/dbMongo.js",
+  "API" : "http://localhost:4500",
+  "refreshDatabase" : false,
+  "priorityConditions" : {
+      "organizations" : [{"name":"bp_frost", "source":"bitbucket"},
+                         {"name":"BP_UI_APPS", "source":"bitbucket"},
+                         {"name":"ciena-frost","source": "github"},
+                         {"name":"ciena-blueplanet","source": "github"}
+                        ],
+      "keywords" : [],
+      "repositories" : []
+    },
+  "ltsCompliant": [{"link":"https://github.com/ciena-blueplanet/ember-cli-ember-ecosystem"},
+                   {"link":"https://github.com/ciena-frost/ember-frost-ecosystem"}
+                  ],
+  "gitAuthorization" : "token 56822a9924a1b2d9109c05c8737b37929b4b7047" ,
+  "bitbucketAuthorization" : ""
+}
